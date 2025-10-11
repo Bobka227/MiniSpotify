@@ -1,0 +1,66 @@
+﻿@model SearchVm
+@{
+    ViewData["Title"] = "Search";
+}
+<h4 class="mb-3">Results: "@Model.Query"</h4>
+
+@if (!Model.Artists.Any() && !Model.Albums.Any() && !Model.Tracks.Any())
+{
+    <div class="text-secondary">Not found.</div>
+}
+
+@if (Model.Artists.Any())
+{
+    <h5 class="mt-4">Artists</h5>
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3">
+        @foreach (var a in Model.Artists)
+        {
+            <div class="col">
+                <div class="card card-dark p-3">
+                    <div class="fw-semibold">@a.Name</div>
+                    <div class="text-secondary small">@a.Country</div>
+                </div>
+            </div>
+        }
+    </div>
+}
+@if (Model.Albums.Any())
+{
+    <h5 class="mt-4">Albums</h5>
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3">
+        @foreach (var al in Model.Albums)
+        {
+            <div class="col">
+                <a asp-controller="Albums" asp-action="Details" asp-route-id="@al.Id" class="text-decoration-none">
+                    <div class="card card-dark">
+                        <img src="@(al.CoverPath ?? "/lib/bootstrap-icons-1.11.3/record.svg")" class="card-img-top" />
+                        <div class="card-body">
+                            <div class="fw-semibold text-light">@al.Title</div>
+                            <div class="text-secondary small">@al.Artist?.Name</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+}
+@if (Model.Tracks.Any())
+{
+    <h5 class="mt-4">Tracks</h5>
+    <ul class="list-group list-group-flush">
+        @foreach (var t in Model.Tracks)
+        {
+            <li class="list-group-item bg-transparent text-light d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="fw-semibold">@t.Title</div>
+                    <div class="text-secondary small">@t.Album?.Artist?.Name — @t.Album?.Title</div>
+                </div>
+                <button class="btn btn-outline-light btn-sm"
+                        onclick="playTrack('@t.FilePath','@t.Title','@t.Album?.Artist?.Name','@Url.Content(t.Album?.CoverPath ?? "")')">
+                    <i class="bi bi-play-fill"></i> Play
+                </button>
+
+            </li>
+        }
+    </ul>
+}

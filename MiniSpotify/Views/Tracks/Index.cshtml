@@ -1,0 +1,34 @@
+﻿@model IEnumerable<MiniSpotify.Models.Track>
+@{
+    ViewData["Title"] = "Tracks";
+}
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h4 class="mb-0">Tracks</h4>
+    <a class="btn btn-sm btn-outline-light" asp-action="Create">Add track</a>
+</div>
+
+<ul class="list-group list-group-flush">
+    @foreach (var t in Model)
+    {
+        <li class="list-group-item bg-transparent text-light d-flex justify-content-between align-items-center">
+            <div>
+                <div class="fw-semibold">@t.Title</div>
+                <div class="text-secondary small">@t.Album?.Artist?.Name — @t.Album?.Title</div>
+            </div>
+            <div class="d-flex gap-2">
+                @* <a class="btn btn-outline-light btn-sm" asp-action="Details" asp-route-id="@t.Id">Details</a> *@
+                <a class="btn btn-outline-light btn-sm" asp-action="Edit" asp-route-id="@t.Id">Edit</a>   <!-- ✅ Кнопка редактирования -->
+                <button class="btn btn-outline-light btn-sm play-btn"
+                        data-queue="tracks"
+                        data-id="@t.Id"
+                        data-src="@t.FilePath"
+                        data-title="@t.Title"
+                        data-artist="@t.Album?.Artist?.Name"
+                        data-cover="@Url.Content(t.Album?.CoverPath ?? "")"
+                        onclick="playFromButton(this)">
+                    <i class="bi bi-play-fill"></i> Play
+                </button>
+            </div>
+        </li>
+    }
+</ul>

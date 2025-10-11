@@ -1,0 +1,34 @@
+﻿@model MiniSpotify.Models.Track
+@{
+    ViewData["Title"] = "Edit track";
+}
+<h4>Edit track</h4>
+<form asp-action="Edit" method="post" enctype="multipart/form-data" class="mt-3">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div class="mb-2">
+        <label class="form-label">Album</label>
+        <select asp-for="AlbumId" class="form-select bg-secondary text-light border-0"
+                asp-items="(SelectList)ViewBag.Albums"></select>
+    </div>
+    <div class="mb-2">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control bg-secondary text-light border-0" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+    <div class="mb-2">
+        <label asp-for="DurationSec" class="form-label"></label>
+        <input asp-for="DurationSec" class="form-control bg-secondary text-light border-0" />
+    </div>
+    <div class="mb-2">
+        <label class="form-label">Replace audio (mp3)</label>
+        <input type="file" name="audioFile" accept="audio/mpeg,audio/mp3"
+               class="form-control bg-secondary text-light border-0" />
+        <div class="text-secondary small mt-1">Current: @Model.FilePath</div>
+    </div>
+    <button class="btn btn-light text-dark">Save</button>
+    <a asp-action="Index" class="btn btn-outline-light">Cancel</a>
+</form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

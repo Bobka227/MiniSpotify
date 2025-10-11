@@ -1,0 +1,27 @@
+﻿@model MiniSpotify.Models.Album
+@{
+    ViewData["Title"] = Model.Title;
+}
+<h4>@Model.Title</h4>
+<div class="text-secondary mb-3">@Model.Artist?.Name</div>
+
+<ul class="list-group list-group-flush">
+    @foreach (var t in Model.Tracks.OrderBy(x => x.Title))
+    {
+        <li class="list-group-item bg-transparent text-light d-flex justify-content-between align-items-center">
+            <span>@t.Title</span>
+            <button class="btn btn-outline-light btn-sm play-btn"
+                    data-queue="album-@Model.Id"
+                    data-id="@t.Id"
+                    data-src="@t.FilePath"
+                    data-title="@t.Title"
+                    data-artist="@Model.Artist?.Name"
+                    data-cover="@Url.Content(Model.CoverPath ?? "")"
+                    onclick="playFromButton(this)">
+                <i class="bi bi-play-fill"></i> Play
+            </button>
+
+
+        </li>
+    }
+</ul>

@@ -1,22 +1,94 @@
-html {
-  font-size: 14px;
+:root {
+    --sidebar-w: 280px;
+    --now-w: 320px;
+    --bg-elev: #121212;
+    --bg-panel: #181818;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+.app-wrapper {
+    min-height: calc(100vh - 72px);
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+.sidebar {
+    width: var(--sidebar-w);
+    background: var(--bg-elev);
+    border-right: 1px solid #2a2a2a;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+.now-playing {
+    width: var(--now-w);
+    background: var(--bg-elev);
+    border-left: 1px solid #2a2a2a;
 }
 
-body {
-  margin-bottom: 60px;
+.content {
+    background: var(--bg-panel);
+}
+
+.player {
+    height: 72px;
+    background: #111;
+    border-top: 1px solid #2a2a2a;
+    position: sticky;
+    bottom: 0;
+}
+
+.sidebar .form-control {
+    color: #ddd;
+}
+
+.sidebar-list li {
+    margin-bottom: .35rem;
+}
+
+.sidebar-link {
+    display: block;
+    padding: .4rem .6rem;
+    border-radius: .5rem;
+    color: #ddd;
+    text-decoration: none;
+}
+
+    .sidebar-link:hover, .sidebar-link.active {
+        background: #2a2a2a;
+        color: #fff;
+    }
+
+.card-dark {
+    background: #222;
+    border: 0;
+}
+
+    .card-dark .card-img-top {
+        border-radius: .75rem;
+    }
+
+
+.album-card {
+    background: #222;
+    border: 0;
+    border-radius: .75rem;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+
+.album-cover {
+    position: relative;
+    width: 100%;
+    padding-top: 100%; 
+    background: #6c757d; 
+}
+
+    .album-cover > img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+.album-body {
+    min-height: 72px;
+    padding: .75rem 1rem;
 }

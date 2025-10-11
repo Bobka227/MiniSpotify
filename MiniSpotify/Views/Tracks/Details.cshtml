@@ -1,0 +1,14 @@
+﻿@model MiniSpotify.Models.Track
+@{
+    ViewData["Title"] = Model.Title;
+}
+<h4>@Model.Title</h4>
+<div class="text-secondary mb-3">@Model.Album?.Artist?.Name — @Model.Album?.Title</div>
+@if (!string.IsNullOrEmpty(Model.FilePath))
+{
+    <audio controls src="@Model.FilePath" style="width:100%;"></audio>
+}
+else
+{
+    <div class="text-secondary">No file attached.</div>
+}

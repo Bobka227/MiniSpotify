@@ -1,0 +1,26 @@
+﻿@model IEnumerable<MiniSpotify.Models.Artist>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">Artists</h4>
+    <a class="btn btn-sm btn-outline-light" asp-action="Create">Add artist</a>
+</div>
+@if (TempData["msg"] is string m)
+{
+    <div class="alert alert-secondary">@m</div>
+}
+
+<ul class="list-group list-group-flush">
+    @foreach (var a in Model)
+    {
+        <li class="list-group-item bg-transparent text-light d-flex justify-content-between">
+            <div><span class="fw-semibold">@a.Name</span> <span class="text-secondary">@a.Country</span></div>
+            <div class="d-flex gap-2">
+                <a class="btn btn-sm btn-outline-light" asp-action="Edit" asp-route-id="@a.Id">Edit</a>
+                <form asp-action="Delete" method="post" class="m-0"
+                      onsubmit="return confirm('Delete artist?');">
+                    <input type="hidden" name="id" value="@a.Id" />
+                    <button class="btn btn-sm btn-outline-danger">Delete</button>
+                </form>
+            </div>
+        </li>
+    }
+</ul>

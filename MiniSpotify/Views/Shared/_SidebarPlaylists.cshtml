@@ -1,0 +1,13 @@
+﻿@using MiniSpotify.Models
+@inject MiniSpotify.Models.AppDbContext Db
+
+<ul class="list-unstyled sidebar-list">
+    @foreach (var p in Db.Playlists.OrderBy(x => x.Name).ToList())
+    {
+        <li>
+            <a class="sidebar-link" asp-controller="Playlists" asp-action="Details" asp-route-id="@p.Id">
+                <i class="bi bi-music-note-list me-2"></i>@p.Name
+            </a>
+        </li>
+    }
+</ul>

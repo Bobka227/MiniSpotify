@@ -1,0 +1,44 @@
+﻿@model MiniSpotify.Models.Album
+@{
+    ViewData["Title"] = "New album";
+}
+
+<h4>Add album</h4>
+
+<form asp-action="Create" method="post" enctype="multipart/form-data" class="mt-3">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-2">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control bg-secondary text-light border-0" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="mb-2">
+        <label class="form-label">Artist</label>
+        <select asp-for="ArtistId"
+                asp-items="ViewBag.Artists"
+                class="form-select bg-secondary text-light border-0">
+        </select>
+        <span asp-validation-for="ArtistId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-2">
+        <label asp-for="ReleaseDate" class="form-label"></label>
+        <input asp-for="ReleaseDate" type="date"
+               class="form-control bg-secondary text-light border-0" />
+        <span asp-validation-for="ReleaseDate" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Cover (jpeg/png)</label>
+        <input type="file" name="coverFile" class="form-control bg-secondary text-light border-0" />
+    </div>
+
+    <button class="btn btn-light text-dark">Save</button>
+    <a asp-action="Index" class="btn btn-outline-light">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

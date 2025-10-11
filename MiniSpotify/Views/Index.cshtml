@@ -1,0 +1,40 @@
+﻿@model IEnumerable<MiniSpotify.Models.Album>
+@{
+    ViewData["Title"] = "Albums";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">Albums</h4>
+    <a class="btn btn-sm btn-outline-light" asp-action="Create">Add album</a>
+</div>
+
+<div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3">
+    @foreach (var al in Model)
+    {
+        <div class="col">
+            <div class="album-card">
+                <a asp-action="Details" asp-route-id="@al.Id" class="text-decoration-none">
+                    <div class="album-cover">
+                        @if (!string.IsNullOrWhiteSpace(al.CoverPath))
+                        {
+                            <img src="@Url.Content(al.CoverPath)" alt="@al.Title cover" />
+                        }
+                        else
+                        {
+                        }
+                    </div>
+                    <div class="album-body">
+                        <div class="fw-semibold text-light">@al.Title</div>
+                        <div class="text-secondary small">@al.Artist?.Name</div>
+                    </div>
+                </a>
+
+                <div class="mt-2">
+                    <a class="btn btn-sm btn-outline-light"
+                       asp-action="Edit"
+                       asp-route-id="@al.Id">Edit</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

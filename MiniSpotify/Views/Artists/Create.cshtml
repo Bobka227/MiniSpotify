@@ -1,0 +1,29 @@
+﻿@model MiniSpotify.Models.Artist
+@{
+    ViewData["Title"] = "Add artist";
+}
+
+<h4 class="mb-3">Add artist</h4>
+
+<form asp-action="Create" method="post" class="mt-2">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-2">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control bg-secondary text-light border-0" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Country" class="form-label"></label>
+        <input asp-for="Country" class="form-control bg-secondary text-light border-0" />
+        <span asp-validation-for="Country" class="text-danger"></span>
+    </div>
+
+    <button class="btn btn-light text-dark">Save</button>
+    <a asp-action="Index" class="btn btn-outline-light">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
