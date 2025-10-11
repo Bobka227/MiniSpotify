@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="spotify.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="0"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="2547"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><table title="Album" custom_title="0" dock_id="1" table="4,5:mainAlbum"/><dock_state state="000000ff00000000fd0000000100000002000003e1000002e6fc0100000001fb000000160064006f0063006b00420072006f00770073006500310100000000000003e10000012800ffffff000002680000000000000004000000040000000800000008fc00000000"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="Authors" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="29"/><column index="2" value="187"/><column index="3" value="218"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1*">PRAGMA foreign_keys = ON;
+
+-- ===== Сущности =====
+CREATE TABLE IF NOT EXISTS Artist (
+    Id            INTEGER PRIMARY KEY,
+    Name          TEXT    NOT NULL,
+    Country       TEXT,
+    CreatedAt     TEXT    NOT NULL DEFAULT (datetime('now')),
+    UpdatedAt     TEXT    NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS Album (
+    Id            INTEGER PRIMARY KEY,
+    ArtistId      INTEGER NOT NULL,
+    Title         TEXT    NOT NULL,
+    ReleaseDate   TEXT,                    -- YYYY-MM-DD
+    CoverPath     TEXT,                    -- относительный путь к обложке, если понадобится
+    CreatedAt     TEXT    NOT NULL DEFAULT (datetime('now')),
+    UpdatedAt     TEXT    NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (ArtistId) REFERENCES Artist(Id) ON DELETE CASCADE,
+    UNIQUE (ArtistId, Title)
+);
+
+CREATE TABLE IF NOT EXISTS Track (
+    Id            INTEGER PRIMARY KEY,
+    AlbumId       INTEGER NOT NULL,
+    Title         TEXT    NOT NULL,
+    DurationSec   INTEGER CHECK (DurationSec IS NULL OR DurationSec &gt;= 0),
+    FilePath      TEXT,                    -- напр. /music/adele_hello.mp3
+    CreatedAt     TEXT    NOT NULL DEFAULT (datetime('now')),
+    UpdatedAt     TEXT    NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (AlbumId) REFERENCES Album(Id) ON DELETE CASCADE,
+    UNIQUE (AlbumId, Title)
+);
+
+CREATE TABLE IF NOT EXISTS Playlist (
+    Id            INTEGER PRIMARY KEY,
+    Name          TEXT    NOT NULL,
+    Description   TEXT,
+    CreatedAt     TEXT    NOT NULL DEFAULT (datetime('now')),
+    UpdatedAt     TEXT    NOT NULL DEFAULT (datetime('now'))
+);
+
+-- связь M:N + порядок треков в плейлисте
+CREATE TABLE IF NOT EXISTS PlaylistTrack (
+    PlaylistId    INTEGER NOT NULL,
+    TrackId       INTEGER NOT NULL,
+    Position      INTEGER NOT NULL DEFAULT 1 CHECK (Position &gt; 0),
+    AddedAt       TEXT    NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (PlaylistId, TrackId),
+    FOREIGN KEY (PlaylistId) REFERENCES Playlist(Id) ON DELETE CASCADE,
+    FOREIGN KEY (TrackId)   REFERENCES Track(Id)    ON DELETE CASCADE
+);
+
+-- ===== Индексы для скорости =====
+CREATE INDEX IF NOT EXISTS IX_Album_ArtistId   ON Album(ArtistId);
+CREATE INDEX IF NOT EXISTS IX_Track_AlbumId    ON Track(AlbumId);
+CREATE INDEX IF NOT EXISTS IX_Artist_Name      ON Artist(Name);
+CREATE INDEX IF NOT EXISTS IX_Album_Title      ON Album(Title);
+CREATE INDEX IF NOT EXISTS IX_Track_Title      ON Track(Title);
+CREATE INDEX IF NOT EXISTS IX_PlaylistTrack_Pos ON PlaylistTrack(PlaylistId, Position);
+
+-- ===== Триггеры на UpdatedAt (опционально, но удобно) =====
+CREATE TRIGGER IF NOT EXISTS trg_artist_updated
+AFTER UPDATE ON Artist FOR EACH ROW
+BEGIN
+    UPDATE Artist SET UpdatedAt = datetime('now') WHERE Id = NEW.Id;
+END;
+
+CREATE TRIGGER IF NOT EXISTS trg_album_updated
+AFTER UPDATE ON Album FOR EACH ROW
+BEGIN
+    UPDATE Album SET UpdatedAt = datetime('now') WHERE Id = NEW.Id;
+END;
+
+CREATE TRIGGER IF NOT EXISTS trg_track_updated
+AFTER UPDATE ON Track FOR EACH ROW
+BEGIN
+    UPDATE Track SET UpdatedAt = datetime('now') WHERE Id = NEW.Id;
+END;
+
+CREATE TRIGGER IF NOT EXISTS trg_playlist_updated
+AFTER UPDATE ON Playlist FOR EACH ROW
+BEGIN
+    UPDATE Playlist SET UpdatedAt = datetime('now') WHERE Id = NEW.Id;
+END;
+
+-- ===== Пробные данные (можно удалить, если не нужно) =====
+INSERT INTO Artist (Name, Country) VALUES
+('Adele', 'UK'),
+('Daft Punk', 'France');
+
+INSERT INTO Album (ArtistId, Title, ReleaseDate) VALUES
+((SELECT Id FROM Artist WHERE Name='Adele'), '25',  '2015-11-20'),
+((SELECT Id FROM Artist WHERE Name='Daft Punk'), 'Random Access Memories', '2013-05-17');
+
+INSERT INTO Track (AlbumId, Title, DurationSec, FilePath) VALUES
+((SELECT al.Id FROM Album al JOIN Artist ar ON al.ArtistId=ar.Id WHERE ar.Name='Adele' AND al.Title='25'),
+ 'Hello', 295, '/music/adele_hello.mp3'),
+((SELECT al.Id FROM Album al JOIN Artist ar ON al.ArtistId=ar.Id WHERE ar.Name='Daft Punk' AND al.Title='Random Access Memories'),
+ 'Get Lucky', 248, '/music/daftpunk_get_lucky.mp3');
+
+INSERT INTO Playlist (Name, Description) VALUES
+('My Favs', 'Любимые треки');
+
+INSERT INTO PlaylistTrack (PlaylistId, TrackId, Position) VALUES
+((SELECT Id FROM Playlist WHERE Name='My Favs'),
+ (SELECT t.Id FROM Track t JOIN Album al ON t.AlbumId=al.Id JOIN Artist ar ON al.ArtistId=ar.Id
+   WHERE t.Title='Hello' AND ar.Name='Adele'), 1),
+((SELECT Id FROM Playlist WHERE Name='My Favs'),
+ (SELECT t.Id FROM Track t JOIN Album al ON t.AlbumId=al.Id JOIN Artist ar ON al.ArtistId=ar.Id
+   WHERE t.Title='Get Lucky' AND ar.Name='Daft Punk'), 2);
+</sql><current_tab id="0"/></tab_sql></sqlb_project>
